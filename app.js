@@ -4,6 +4,10 @@ const bodyParser = require('body-parser');
 const handleErrors = require('./middleware/handleErrors');
 const sequelize = require('./utils/database');
 
+// Database models
+const Expense = require('./models/expense');
+const User = require('./models/user');
+
 const expenseRoutes = require('./routes/expense');
 const userRoutes = require('./routes/user');
 
@@ -24,6 +28,10 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/users', userRoutes);
 
 app.use(handleErrors);
+
+// Database associations
+User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' });
+Expense.belongsTo(User);
 
 sequelize.sync().then(() => {
     console.log('Connection has been established successfully.');

@@ -21,8 +21,9 @@ exports.getAllExpenses = (req, res, next) => {
 
 exports.createExpense = (req, res, next) => {
     const { name, category, price, currency, date, type } = req.body;
+    const { userId } = req?.userData;
 
-    Expense.create({ name, category, price, currency, date, type }).then(newExpense => {
+    Expense.create({ name, category, price, currency, date, type, userId }).then(newExpense => {
         return res.status(201).json({
             message: "Expense data has been created successfully!",
             expenseData: newExpense
