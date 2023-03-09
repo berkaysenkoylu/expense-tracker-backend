@@ -30,7 +30,30 @@ exports.getUsers = (req, res, next) => {
 }
 
 exports.getUser = (req, res, next) => {
-    
+    User.findOne({ where: { id: req.params.id }, attributes: { exclude: ['password', 'resetToken', 'resetTokenExpiration', 'createdAt', 'updatedAt'] } }).then(fetchedUser => {
+        if (!fetchedUser) {
+            let error = new Error();
+            error.statusCode = 404;
+            error.message = 'No such user was found!';
+
+            return next(error);
+        }
+
+        return res.status(200).json({
+            message: 'User has been fetched successfully!',
+            userData: fetchedUser
+        });
+    }).catch(error => {
+        if(!error.statusCode) {
+            error.statusCode = 500;
+        }
+
+        if(!error.message) {
+            error.message = 'Something went wrong!';
+        }
+
+        next(error);
+    });
 }
 
 exports.createUser = (req, res, next) => {
@@ -169,6 +192,7 @@ exports.loginUser = (req, res, next) => {
                 avatarUrl: userData.avatarUrl,
                 dateOfBirth: userData.dateOfBirth
             },
+            expiresIn: '3600',
             token
         });
     }).catch(error => {
